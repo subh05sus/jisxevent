@@ -108,7 +108,7 @@ export default async function DashboardPage() {
                   </Button>
                 </Link>
                 <Link href="/attendance/scan">
-                  <Button size="sm" className="w-full">
+                  <Button size="sm" className="w-full mt-2">
                     Scan Attendance
                   </Button>
                 </Link>

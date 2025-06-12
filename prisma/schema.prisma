@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(cuid())
+  name     String
+  email    String   @unique
+  jisid    String   @unique
+  password String
+  role     Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  events            Event[]        @relation("OrganizedEvents")
+  registrations     Registration[]
+  markedAttendance  Attendance[]   @relation("MarkedAttendance")
+
+  @@map("users")
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  date        DateTime
+  venue       String
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  organizer     User           @relation("OrganizedEvents", fields: [createdBy], references: [id], onDelete: Cascade)
+  registrations Registration[]
+
+  @@map("events")
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  ticketId  String   @unique @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relations
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event      Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  attendance Attendance?
+
+  @@unique([userId, eventId])
+  @@map("registrations")
+}
+
+model Attendance {
+  id             String   @id @default(cuid())
+  registrationId String   @unique
+  markedAt       DateTime @default(now())
+  markedBy       String
+
+  // Relations
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  markedByUser User         @relation("MarkedAttendance", fields: [markedBy], references: [id])
+
+  @@map("attendance")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}

@@ -20,7 +20,7 @@ export const metadata = {
 };
 
 export default async function DashboardPage() {
-  const user = await requireAuth() as any;
+  const user = (await requireAuth()) as any;
   const registrations = await getUserRegistrations(user.id);
   const organizedEvents =
     user.role === "ADMIN" ? await getEventsByOrganizer(user.id) : [];
@@ -105,6 +105,11 @@ export default async function DashboardPage() {
                 <Link href="/admin">
                   <Button size="sm" className="w-full">
                     Manage Events
+                  </Button>
+                </Link>
+                <Link href="/attendance/scan">
+                  <Button size="sm" className="w-full">
+                    Scan Attendance
                   </Button>
                 </Link>
               </CardContent>

@@ -83,7 +83,8 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).role = token.role as "ADMIN" | "STUDENT";
       }
       return session;
-    },  },
+    },
+  },
   pages: {
     signIn: "/auth/login",
   },
@@ -93,9 +94,10 @@ export const authOptions: NextAuthOptions = {
   },
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === "production" 
-        ? "__Secure-next-auth.session-token" 
-        : "next-auth.session-token",
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
       options: {
         httpOnly: true,
         sameSite: "lax",

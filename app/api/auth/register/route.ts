@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     }
 
     console.error("Registration error:", error);
-    
+
     // Handle database connection errors
     if (error instanceof Error && error.message.includes("database")) {
       return NextResponse.json(
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
         { status: 503 }
       );
     }
-    
+
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

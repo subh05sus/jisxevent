@@ -20,7 +20,7 @@ export const metadata = {
 };
 
 export default async function TicketsPage() {
-  const user = await requireAuth();
+  const user = await requireAuth() as any;
   const registrations = await getUserRegistrations(user.id);
 
   const upcomingRegistrations = registrations.filter((reg) =>

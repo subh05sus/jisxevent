@@ -19,8 +19,10 @@ import {
   AlertCircleIcon,
   ScanIcon,
   UserCheckIcon,
+  CameraIcon,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { QRScanner } from "@/components/ui/qr-scanner";
 
 interface AttendanceResult {
   success: boolean;
@@ -42,6 +44,7 @@ export function AttendanceScanner() {
   const [recentAttendance, setRecentAttendance] = useState<AttendanceResult[]>(
     []
   );
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const { toast } = useToast();
 
   const handleScan = async (e: React.FormEvent) => {
@@ -120,6 +123,16 @@ export function AttendanceScanner() {
     }
   };
 
+  const handleQrScan = (data: string) => {
+    setTicketId(data);
+    setIsScannerOpen(false);
+    // Create a synthetic form event to trigger handleScan
+    const syntheticEvent = {
+      preventDefault: () => {},
+    } as React.FormEvent;
+    handleScan(syntheticEvent);
+  };
+
   return (
     <div className="space-y-6">
       {/* Scanner Form */}
@@ -144,6 +157,15 @@ export function AttendanceScanner() {
                 className="flex-1"
                 autoFocus
               />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsScannerOpen(true)}
+                disabled={isLoading}
+              >
+                <CameraIcon className="h-4 w-4 mr-2" />
+                Scan
+              </Button>
               <Button type="submit" disabled={isLoading || !ticketId.trim()}>
                 {isLoading ? "Processing..." : "Mark Attendance"}
               </Button>
@@ -228,12 +250,33 @@ export function AttendanceScanner() {
         </CardHeader>
         <CardContent className="text-sm text-gray-600 space-y-2">
           <p>• Students should show their QR code from their ticket</p>
-          <p>• You can manually enter the ticket ID or scan the QR code</p>
+          <p>
+            • You can manually enter the ticket ID or use the camera to scan QR
+            codes
+          </p>
+          <p>• Click the "Scan" button to open the camera scanner</p>
           <p>• Attendance can only be marked on the event day</p>
           <p>• Each ticket can only be marked once</p>
           <p>• The system will show confirmation for each successful scan</p>
         </CardContent>
       </Card>
+
+      {/* QR Code Scanner Modal */}
+      {isScannerOpen && (
+        <QRScanner
+          isActive={isScannerOpen}
+          onClose={() => setIsScannerOpen(false)}
+          onResult={handleQrScan}
+          onError={(error) => {
+            console.error("QR Scanner error:", error);
+            toast({
+              title: "Scanner Error",
+              description: "Failed to scan QR code. Please try again.",
+              variant: "destructive",
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

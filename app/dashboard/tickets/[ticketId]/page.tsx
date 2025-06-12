@@ -6,9 +6,11 @@ import TicketClientPage from "./TicketClientPage";
 export async function generateMetadata({
   params,
 }: {
-  params: { ticketId: string };
+  params: Promise<{ ticketId: string }>;
 }) {
-  const registration = await getRegistrationByTicketId(params.ticketId);
+  // Await params since it's now a Promise
+  const { ticketId } = await params;
+  const registration = await getRegistrationByTicketId(ticketId);
 
   if (!registration) {
     return {
@@ -25,10 +27,13 @@ export async function generateMetadata({
 export default async function TicketPage({
   params,
 }: {
-  params: { ticketId: string };
+  params: Promise<{ ticketId: string }>;
 }) {
-  const user = await requireAuth();
-  const registration = await getRegistrationByTicketId(params.ticketId);
+  const user = (await requireAuth()) as any;
+
+  // Await params since it's now a Promise
+  const { ticketId } = await params;
+  const registration = await getRegistrationByTicketId(ticketId);
 
   if (!registration || registration.userId !== user.id) {
     notFound();

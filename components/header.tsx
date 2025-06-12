@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export function Header() {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession() as any;
 
   const isActive = (path: string) => {
     return pathname === path;

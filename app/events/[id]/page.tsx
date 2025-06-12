@@ -5,15 +5,21 @@ import { CalendarIcon, MapPinIcon, ClockIcon, UserIcon } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { RegisterButton } from "@/components/register-button";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma"; // Declare the prisma variable
 import { isUserRegistered } from "@/lib/data/registrations";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const event = await getEventById(params.id);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  // Await params since it's now a Promise
+  const { id } = await params;
+  const event = await getEventById(id);
 
   if (!event) {
     return {
@@ -30,10 +36,12 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 export default async function EventPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const event = await getEventById(params.id);
-  const session = await getServerSession(authOptions);
+  // Await params since it's now a Promise
+  const { id } = await params;
+  const event = await getEventById(id);
+  const session = (await getServerSession(authOptions)) as any;
 
   if (!event) {
     notFound();

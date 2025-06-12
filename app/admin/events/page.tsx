@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 interface EventsPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function AdminEventsPage({
@@ -37,11 +37,14 @@ export default async function AdminEventsPage({
 }: EventsPageProps) {
   await requireAdmin();
 
+  // Await searchParams since it's now a Promise
+  const params = await searchParams;
+
   // Build filter conditions
   const where: any = {};
-  const search = searchParams.search as string;
-  const status = searchParams.status as string;
-  const venue = searchParams.venue as string;
+  const search = params.search as string;
+  const status = params.status as string;
+  const venue = params.venue as string;
 
   if (search) {
     where.OR = [
@@ -164,7 +167,7 @@ export default async function AdminEventsPage({
               <CalendarIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-medium text-gray-900 mb-2">
                 No events found
-              </h3>
+              </h3>{" "}
               <p className="text-gray-500 mb-6">
                 {search || status || venue
                   ? "Try adjusting your filters"

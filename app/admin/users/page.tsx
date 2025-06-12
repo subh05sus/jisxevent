@@ -33,14 +33,17 @@ export const metadata = {
 };
 
 interface UsersPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function AdminUsersPage({ searchParams }: UsersPageProps) {
   await requireAdmin();
 
-  const search = searchParams.search as string;
-  const role = searchParams.role as string;
+  // Await searchParams since it's now a Promise
+  const params = await searchParams;
+
+  const search = params.search as string;
+  const role = params.role as string;
 
   // Build filter conditions
   const where: any = {};
@@ -166,7 +169,7 @@ export default async function AdminUsersPage({ searchParams }: UsersPageProps) {
               <UsersIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-medium text-gray-900 mb-2">
                 No users found
-              </h3>
+              </h3>{" "}
               <p className="text-gray-500">
                 {search || role
                   ? "Try adjusting your filters"

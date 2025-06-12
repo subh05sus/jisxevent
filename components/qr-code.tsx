@@ -1,16 +1,20 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
-import QRCode from "qrcode"
+import { useEffect, useRef } from "react";
+import QRCode from "qrcode";
 
 interface QRCodeProps {
-  value: string
-  size?: number
-  className?: string
+  value: string;
+  size?: number;
+  className?: string;
 }
 
-export function QRCodeComponent({ value, size = 128, className = "" }: QRCodeProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+export function QRCodeComponent({
+  value,
+  size = 128,
+  className = "",
+}: QRCodeProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -21,9 +25,9 @@ export function QRCodeComponent({ value, size = 128, className = "" }: QRCodePro
           dark: "#000000",
           light: "#FFFFFF",
         },
-      })
+      });
     }
-  }, [value, size])
+  }, [value, size]);
 
-  return <canvas ref={canvasRef} className={className} />
+  return <canvas ref={canvasRef} className={className} />;
 }

@@ -11,9 +11,11 @@ export const metadata = {
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const events = await getEvents(searchParams);
+  // Await searchParams since it's now a Promise
+  const params = await searchParams;
+  const events = await getEvents(params);
 
   return (
     <div className="container mx-auto py-8 px-4">

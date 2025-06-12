@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { z } from "zod";
 
 // GET a specific event by ID
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params since it's now a Promise
+    const { id } = await params;
+
     const event = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!event) {
@@ -31,14 +34,17 @@ export async function GET(
 // PUT update an event
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = (await getServerSession(authOptions)) as any;
 
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+
+    // Await params since it's now a Promise
+    const { id } = await params;
 
     const body = await req.json();
 
@@ -63,11 +69,9 @@ export async function PUT(
         .optional(),
     });
 
-    const validatedData = eventSchema.parse(body);
-
-    // Check if event exists
+    const validatedData = eventSchema.parse(body); // Check if event exists
     const existingEvent = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingEvent) {
@@ -76,7 +80,7 @@ export async function PUT(
 
     // Update event
     const updatedEvent = await prisma.event.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(validatedData.title && { title: validatedData.title }),
         ...(validatedData.description && {
@@ -107,18 +111,21 @@ export async function PUT(
 // DELETE an event
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = (await getServerSession(authOptions)) as any;
 
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    // Await params since it's now a Promise
+    const { id } = await params;
+
     // Check if event exists
     const existingEvent = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingEvent) {
@@ -127,7 +134,7 @@ export async function DELETE(
 
     // Delete event
     await prisma.event.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json(

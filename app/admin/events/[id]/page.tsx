@@ -15,9 +15,14 @@ import { CalendarIcon, MapPinIcon, UsersIcon, ClockIcon } from "lucide-react";
 import Link from "next/link";
 import { formatDate, formatDateTime, isEventUpcoming } from "@/lib/utils";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const event = await prisma.event.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!event) {
@@ -29,16 +34,16 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     description: `Edit event details for ${event.title}`,
   };
 }
-
 export default async function EditEventPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   await requireAdmin();
 
+  const { id } = await params;
   const event = await prisma.event.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       organizer: {
         select: { name: true, jisid: true },

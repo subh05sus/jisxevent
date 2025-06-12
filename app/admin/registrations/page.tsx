@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 interface RegistrationsPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function AdminRegistrationsPage({
@@ -37,9 +37,12 @@ export default async function AdminRegistrationsPage({
 }: RegistrationsPageProps) {
   await requireAdmin();
 
-  const eventId = searchParams.eventId as string;
-  const search = searchParams.search as string;
-  const status = searchParams.status as string;
+  // Await searchParams since it's now a Promise
+  const params = await searchParams;
+
+  const eventId = params.eventId as string;
+  const search = params.search as string;
+  const status = params.status as string;
 
   // Build filter conditions
   const where: any = {};
@@ -225,7 +228,7 @@ export default async function AdminRegistrationsPage({
               <TicketIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-medium text-gray-900 mb-2">
                 No registrations found
-              </h3>
+              </h3>{" "}
               <p className="text-gray-500 mb-6">
                 {search || status || eventId
                   ? "Try adjusting your filters to see more results"

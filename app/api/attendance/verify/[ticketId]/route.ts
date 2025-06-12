@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
+import { authOptions } from "@/lib/authOptions";
 // GET - Verify ticket and show attendance form
 export async function GET(
   req: Request,
-  { params }: { params: { ticketId: string } }
+  { params }: { params: Promise<{ ticketId: string }> }
 ) {
   try {
+    // Await params since it's now a Promise
+    const { ticketId } = await params;
+
     const registration = await prisma.registration.findUnique({
-      where: { ticketId: params.ticketId },
+      where: { ticketId },
       include: {
         user: {
           select: { name: true, jisid: true, email: true },
@@ -53,18 +55,21 @@ export async function GET(
 // POST - Mark attendance
 export async function POST(
   req: Request,
-  { params }: { params: { ticketId: string } }
+  { params }: { params: Promise<{ ticketId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = (await getServerSession(authOptions)) as any;
 
     // Only admins can mark attendance
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    // Await params since it's now a Promise
+    const { ticketId } = await params;
+
     const registration = await prisma.registration.findUnique({
-      where: { ticketId: params.ticketId },
+      where: { ticketId },
       include: {
         user: {
           select: { name: true, jisid: true },

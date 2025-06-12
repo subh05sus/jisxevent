@@ -36,8 +36,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
+    resolver: zodResolver(loginSchema),    defaultValues: {
       jisid: "",
       password: "",
     },
@@ -52,18 +51,34 @@ export default function LoginPage() {
         jisid: data.jisid,
         password: data.password,
         redirect: false,
+        callbackUrl,
       })
 
+      console.log("Sign in result:", result)
+
       if (result?.error) {
-        setError("Invalid JIS ID or password")
+        console.error("Sign in error:", result.error)
+        if (result.error === "CredentialsSignin") {
+          setError("Invalid JIS ID or password")
+        } else {
+          setError("Authentication failed. Please try again.")
+        }
         setIsLoading(false)
         return
       }
 
-      router.push(callbackUrl)
-      router.refresh()
+      if (result?.ok) {
+        // Wait a moment for the session to be established
+        setTimeout(() => {
+          router.push(callbackUrl)
+          router.refresh()
+        }, 100)
+      } else {
+        setError("Authentication failed. Please check your credentials.")
+        setIsLoading(false)      }
     } catch (error) {
-      setError("An unexpected error occurred. Please try again.")
+      console.error("Login error:", error)
+      setError("Network error. Please check your connection and try again.")
       setIsLoading(false)
     }
   }

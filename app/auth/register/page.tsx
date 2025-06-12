@@ -55,7 +55,6 @@ export default function RegisterPage() {
       password: "",
     },
   });
-
   async function onSubmit(data: RegisterFormValues) {
     setIsLoading(true);
     setError(null);
@@ -72,6 +71,7 @@ export default function RegisterPage() {
       const result = await response.json();
 
       if (!response.ok) {
+        console.error("Registration error:", result);
         setError(result.message || "Registration failed");
         setIsLoading(false);
         return;
@@ -84,6 +84,7 @@ export default function RegisterPage() {
 
       router.push("/auth/login");
     } catch (error) {
+      console.error("Registration network error:", error);
       setError("An unexpected error occurred. Please try again.");
       setIsLoading(false);
     }

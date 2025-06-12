@@ -3,6 +3,10 @@ import { withAuth } from "next-auth/middleware";
 export default withAuth(
   function middleware(req) {
     // Add any additional middleware logic here
+    // Only log in development
+    if (process.env.NODE_ENV === "development") {
+      console.log("Middleware executing for:", req.nextUrl.pathname);
+    }
   },
   {
     callbacks: {

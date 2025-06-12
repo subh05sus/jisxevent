@@ -72,6 +72,15 @@ export async function POST(req: Request) {
     }
 
     console.error("Registration error:", error);
+    
+    // Handle database connection errors
+    if (error instanceof Error && error.message.includes("database")) {
+      return NextResponse.json(
+        { message: "Database connection error. Please try again later." },
+        { status: 503 }
+      );
+    }
+    
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

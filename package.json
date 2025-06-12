@@ -1,15 +1,15 @@
 {
   "name": "jis-event-management",
   "version": "0.1.0",
-  "private": true,
-  "scripts": {
+  "private": true,  "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "generate-secrets": "node scripts/generate-secrets.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
